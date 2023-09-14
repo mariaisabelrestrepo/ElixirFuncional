@@ -1,6 +1,6 @@
 defmodule MathChallenger.MemoryTasks do
 
-  import Matchallenger.MemoryUtils
+  import MathChallenger.MemoryUtils
 
   defp selected_letters(map_alphabet)  do
     vocales = get_vowels(map_alphabet, [])
@@ -11,9 +11,9 @@ defmodule MathChallenger.MemoryTasks do
   def init_game do
     sel_letters = selected_letters(alphabet_map())
     solved = load_board(sel_letters)
-    IO.puts("¡Bienvenido!")
-    player ="isabel"  #   git
-    game(board(), solved, player, 3, 0, 0)
+    IO.puts("¡Bienvenido, vamos a jugar!")
+    nickname = IO.gets("Ingrese su nickname: ") |> String.trim
+    game(board(), solved, nickname, 3, 0, 0)
 
   end
 
@@ -32,6 +32,8 @@ defmodule MathChallenger.MemoryTasks do
                |> Enum.map(&String.to_integer/1)
                |> List.to_tuple
 
+    #Las coordenadas recibidas, invertirlas.
+    _ing_pair_r = ing_pair |> Tuple.to_list |> Enum.reverse |> List.to_tuple
 
     #Construyendo los pares {{letra1, posicion1},{letra2,posicion2}} que corresponde a la coordenada ingresada.
     {pair1, pair2} = raw_positions(Map.keys(solved_board),Map.values(solved_board))
@@ -40,10 +42,11 @@ defmodule MathChallenger.MemoryTasks do
     #Mostrar la selección en el tablero utilizando lo anterior
     IO.puts(reveal_cards(board_on, pair1, pair2))
 
+
     case {String.downcase(elem(pair1, 1)), String.downcase(elem(pair2, 1))} do
       {match1, match2} when match1 == match2 ->
         updated_board = reveal_cards(board_on, pair1, pair2)
-        {vowel, consonant} = compare_pair(pair1)
+        {vowel, consonant} = verify_letter(pair1)
         game(updated_board, solved_board, player, lifes, acc_v + (vowel == :correct), acc_c + (consonant == :correct))
 
       _ ->
@@ -51,7 +54,7 @@ defmodule MathChallenger.MemoryTasks do
         game(board_on, solved_board, player, lifes - 1, acc_v, acc_c)
     end
 
-end
+  end
 
   defp game(_, _, _, lifes, _acc_v, _acc_c) when lifes == 0, do: {:gameover, :finished}
 

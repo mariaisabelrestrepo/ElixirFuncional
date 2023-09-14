@@ -1,10 +1,10 @@
-defmodule Matchallenger.MemoryUtils do
+defmodule MathChallenger.MemoryUtils do
   #Carga del tablero
   def board() do
     """
-    [ 1 ]  [ 2  ]  [ 3  ]  [ 4  ]
-    [ 5 ]  [ 6  ]  [ 7  ]  [ 8  ]
-    [ 9 ]  [ 10 ]  [ 11 ]  [ 12 ]
+    [ -1- ]  [ -2- ]  [ -3- ]  [ -4- ]
+    [ -5- ]  [ -6- ]  [ -7- ]  [ -8- ]
+    [ -9- ] [ -10- ] [ -11- ] [ -12- ]
     """
   end
 
@@ -52,44 +52,30 @@ defmodule Matchallenger.MemoryUtils do
     #se agrupa en pares (Lista de listas) y luego se vuelve una lista de tuplas
 
 
-    pos_pares = 1..12 |> Enum.to_list |> Enum.shuffle() |> Enum.chunk_every(2) |> Enum.map(fn [a, b] -> {a, b} end)
-
-    Map.new(Enum.zip(pos_pares,sel_letters))
-
+    pos_pares = 1..12
+                |> Enum.to_list
+                |> Enum.shuffle()
+                |> Enum.chunk_every(2)
+                |> Enum.map(fn[a,b] -> {a,b} end)
+                |> Enum.zip(sel_letters)
+                |> Map.new()
   end
-  #Resultado esperado (ejemplo que varía por la aleatoriedad): 1..12 > [1,2,3,4...,12] > [5,1,6,7,...,9,8] > [[5, 1], [6, 7], ..., [9, 8]] > [{5, 1}, {6, 7}, ..., {9, 8}]
-
-  #Por completar: Asociar el contenido de pos_pares a sel_letters de modo que a cada par de posiciones en pos_pares
-  #le corresponda un par de vocales/consonantes de sel letters por medio de un mapa.
-  #Resultado esperado
-  #   %{
-  #  {1, 6} => {"S", "s", :consonante, :notfound},
-  #  {4, 2} => {"O", "o", :vocal, :notfound},
-  #  {5, 3} => {"H", "h", :consonante, :notfound},
-  #  {9, 12} => {"E", "e", :vocal, :notfound},
-  #  {10, 7} => {"U", "u", :vocal, :notfound},
-  #  {11, 8} => {"B", "b", :consonante, :notfound}
-  # }
 
 
-  #Por completar: Generar un mapa donde la clave sea el número/posición y el valor la letra. LISTO
+  #Por completar: Generar un mapa donde la clave sea el número/posición y el valor la letra.
   def raw_positions(pos_pares, sel_letters) do
-    Enum.zip(
-      Enum.flat_map(pos_pares, fn {x, y} -> [x,y] end),
-      Enum.flat_map(sel_letters, fn {x, y, _w, _z} -> [x,y] end))
-    |> Map.new
+    result_pos_pares = Enum.flat_map(pos_pares, fn {u, v} -> [u, v] end)
+    result_sel_letters = Enum.flat_map(sel_letters, fn {u, v, _w, _z} -> [u, v] end)
+
+    zipped_result = Enum.zip(result_pos_pares, result_sel_letters)
+    map_result = Map.new(zipped_result)
   end
 
-  def compare_pair(par) do
-    vowels = ["a", "e", "i", "o", "u"]
-    case String.downcase(elem(par,1)) in vowels do
+  def verify_letter({_, letter, _, _}) do
+    case String.downcase(letter) in ~w(a e i o u)a do
       true -> {:correct, :vocal}
-      false -> {:correct, :consonante}
+      _ -> {:correct, :consonante}
     end
   end
 
 end
-
-
-
-#c("lib/memory/memory_utils.ex")
